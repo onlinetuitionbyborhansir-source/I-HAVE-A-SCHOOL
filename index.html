@@ -1,0 +1,926 @@
+<html lang="bn" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Have A School - আপনার শিক্ষার সহযাত্রী</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        royal: { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81',950:'#1e1b4b' },
+                        accent: { 400:'#f472b6',500:'#ec4899',600:'#db2777' }
+                    },
+                    fontFamily: { bn:['Noto Sans Bengali','sans-serif'], en:['Poppins','sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Noto Sans Bengali','sans-serif'; background:#0f0f1a; color:#e2e8f0; overflow-x:hidden; }
+        ::-webkit-scrollbar { width:8px; }
+        ::-webkit-scrollbar-track { background:#1e1b4b; }
+        ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#6366f1,#ec4899); border-radius:4px; }
+
+        .hero-slide { position:absolute; inset:0; opacity:0; transition:opacity 1s ease, transform 1s ease; transform:scale(1.05); }
+        .hero-slide.active { opacity:1; transform:scale(1); }
+        .gradient-text { background:linear-gradient(135deg,#818cf8,#f472b6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .glass { background:rgba(30,27,75,0.6); backdrop-filter:blur(20px); border:1px solid rgba(99,102,241,0.15); }
+        .glass-light { background:rgba(255,255,255,0.05); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.08); }
+        .glow { box-shadow:0 0 30px rgba(99,102,241,0.3), 0 0 60px rgba(99,102,241,0.1); }
+        .glow-pink { box-shadow:0 0 30px rgba(236,72,153,0.3), 0 0 60px rgba(236,72,153,0.1); }
+        .card-hover { transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+        .card-hover:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 20px 60px rgba(99,102,241,0.2); }
+
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes pulse-glow { 0%,100%{box-shadow:0 0 20px rgba(37,211,102,0.4)} 50%{box-shadow:0 0 40px rgba(37,211,102,0.8)} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes orbit { from{transform:rotate(0deg) translateX(120px) rotate(0deg)} to{transform:rotate(360deg) translateX(120px) rotate(-360deg)} }
+
+        .animate-float { animation:float 3s ease-in-out infinite; }
+        .animate-pulse-glow { animation:pulse-glow 2s ease-in-out infinite; }
+        .animate-slide-up { animation:slideUp 0.8s ease-out forwards; }
+
+        .particle { position:absolute; width:4px; height:4px; background:rgba(99,102,241,0.4); border-radius:50%; pointer-events:none; }
+
+        .nav-link { position:relative; }
+        .nav-link::after { content:''; position:absolute; bottom:-4px; left:50%; width:0; height:2px; background:linear-gradient(90deg,#6366f1,#ec4899); transition:all 0.3s; transform:translateX(-50%); }
+        .nav-link:hover::after { width:100%; }
+
+        .admin-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:9998; display:none; }
+        .admin-overlay.show { display:block; }
+        .admin-panel { position:fixed; top:0; right:-500px; width:min(480px,95vw); height:100vh; background:#0f0f1a; border-left:1px solid rgba(99,102,241,0.3); z-index:9999; transition:right 0.5s cubic-bezier(0.77,0,0.175,1); overflow-y:auto; padding:2rem; }
+        .admin-panel.open { right:0; }
+
+        .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:1rem; }
+        .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; border-radius:1rem; }
+
+        .blob { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.3; pointer-events:none; }
+
+        .tag { display:inline-block; padding:0.2rem 0.8rem; border-radius:9999px; font-size:0.75rem; font-weight:600; }
+
+        .slider-dot { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.3); cursor:pointer; transition:all 0.3s; }
+        .slider-dot.active { background:#6366f1; transform:scale(1.3); box-shadow:0 0 15px rgba(99,102,241,0.5); }
+
+        input:focus, textarea:focus, select:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.2); }
+
+        .section-reveal { opacity:0; transform:translateY(30px); transition:all 0.8s ease; }
+        .section-reveal.visible { opacity:1; transform:translateY(0); }
+
+        @media(max-width:768px) {
+            .hero-title { font-size:2rem !important; }
+            .hero-sub { font-size:1rem !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Floating Particles Background -->
+<div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+
+<!-- Background Blobs -->
+<div class="blob w-96 h-96 bg-royal-500 top-0 left-0" style="top:-10%;left:-10%"></div>
+<div class="blob w-80 h-80 bg-accent-500" style="top:40%;right:-10%"></div>
+<div class="blob w-72 h-72 bg-royal-700" style="bottom:-5%;left:30%"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 sm:h-20">
+            <a href="#" class="flex items-center gap-2 sm:gap-3 group">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-royal-500 to-accent-500 flex items-center justify-center glow group-hover:scale-110 transition-transform">
+                    <i class="fas fa-graduation-cap text-white text-base sm:text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-lg sm:text-xl font-bold gradient-text font-en">I Have A School</span>
+                    <span class="block text-[10px] text-royal-300 -mt-1">আপনার শিক্ষার সহযাত্রী</span>
+                </div>
+            </a>
+
+            <div class="hidden lg:flex items-center gap-8">
+                <a href="#home" class="nav-link text-sm text-gray-300 hover:text-white transition">হোম</a>
+                <a href="#posts" class="nav-link text-sm text-gray-300 hover:text-white transition">পোস্ট ও নোটস</a>
+                <a href="#courses" class="nav-link text-sm text-gray-300 hover:text-white transition">কোর্সসমূহ</a>
+                <a href="#videos" class="nav-link text-sm text-gray-300 hover:text-white transition">ভিডিও</a>
+                <a href="#teacher" class="nav-link text-sm text-gray-300 hover:text-white transition">শিক্ষক</a>
+                <a href="#contact" class="nav-link text-sm text-gray-300 hover:text-white transition">যোগাযোগ</a>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="openAdminLogin()" class="text-gray-400 hover:text-royal-400 transition p-2" title="Admin">
+                    <i class="fas fa-cog text-base sm:text-lg"></i>
+                </button>
+                <a href="#courses" class="hidden sm:inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-royal-600 to-accent-500 rounded-full text-white text-xs sm:text-sm font-semibold hover:shadow-lg hover:shadow-royal-500/30 transition-all">
+                    ভর্তি হন
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+                <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-300 p-2">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="lg:hidden hidden glass border-t border-royal-500/20">
+        <div class="px-4 py-4 space-y-3">
+            <a href="#home" onclick="closeMobileMenu()" class="block py-2 text-gray-300 hover:text-white transition">হোম</a>
+            <a href="#posts" onclick="closeMobileMenu()" class="block py-2 text-gray-300 hover:text-white transition">পোস্ট ও নোটস</a>
+            <a href="#courses" onclick="closeMobileMenu()" class="block py-2 text-gray-300 hover:text-white transition">কোর্সসমূহ</a>
+            <a href="#videos" onclick="closeMobileMenu()" class="block py-2 text-gray-300 hover:text-white transition">ভিডিও</a>
+            <a href="#teacher" onclick="closeMobileMenu()" class="block py-2 text-gray-300 hover:text-white transition">শিক্ষক</a>
+            <a href="#contact" onclick="closeMobileMenu()" class="block py-2 text-gray-300 hover:text-white transition">যোগাযোগ</a>
+            <a href="#courses" onclick="closeMobileMenu()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-royal-600 to-accent-500 rounded-full text-white text-sm font-semibold">
+                ভর্তি হন <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section id="home" class="relative min-h-screen flex items-center overflow-hidden pt-20">
+    <div id="heroSlider" class="absolute inset-0">
+        <!-- Slides rendered by JS -->
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f0f1a]/60 to-[#0f0f1a]"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light mb-6 sm:mb-8 animate-slide-up" style="animation-delay:0.2s">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span class="text-xs sm:text-sm text-royal-200">ফ্ি ক্লাস চলছে — এখনই যুক্ত হন!</span>
+        </div>
+        <h1 id="heroTitle" class="hero-title text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight mb-4 sm:mb-6 animate-slide-up" style="animation-delay:0.4s">
+            <span class="gradient-text">শিক্ষার আলো</span> ছড়িয়ে<br class="hidden sm:block"> সবার মাঝে
+        </h1>
+        <p id="heroSub" class="hero-sub text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8 sm:mb-10 animate-slide-up" style="animation-delay:0.6s">
+            নিয়মিত পড়াশোনার পোস্ট, নোটস, ফ্রি ভিডিও ক্লাস, সাজেশন এবং মানসম্মত কোর্সসমূহ — সবকিছু এক জায়গায়।
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-slide-up" style="animation-delay:0.8s">
+            <a href="#courses" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-gradient-to-r from-royal-600 to-royal-500 rounded-xl text-white font-semibold hover:shadow-xl hover:shadow-royal-500/30 transition-all text-sm sm:text-base">
+                <i class="fas fa-book-open"></i> কোর্স দেখুন
+            </a>
+            <a href="#videos" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 glass-light rounded-xl text-royal-200 font-semibold hover:bg-white/10 transition-all text-sm sm:text-base">
+                <i class="fas fa-play-circle"></i> ফ্রি ক্লাস দেখুন
+            </a>
+        </div>
+
+        <!-- Slider Dots -->
+        <div class="flex items-center justify-center gap-3 mt-10 sm:mt-14">
+            <div class="slider-dot active" onclick="goToSlide(0)"></div>
+            <div class="slider-dot" onclick="goToSlide(1)"></div>
+            <div class="slider-dot" onclick="goToSlide(2)"></div>
+        </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="absolute bottom-0 left-0 right-0 z-10 glass border-t border-royal-500/10">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:py-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div>
+                <div class="text-xl sm:text-3xl font-bold gradient-text font-en">500+</div>
+                <div class="text-xs text-gray-400 mt-1">শিক্ষার্থী</div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold gradient-text font-en">50+</div>
+                <div class="text-xs text-gray-400 mt-1">ফ্রি ভিডিও</div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold gradient-text font-en">10+</div>
+                <div class="text-xs text-gray-400 mt-1">কোর্স</div>
+            </div>
+            <div>
+                <div class="text-xl sm:text-3xl font-bold gradient-text font-en">100+</div>
+                <div class="text-xs text-gray-400 mt-1">পোস্ট ও নোটস</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- POSTS & PDF SECTION -->
+<section id="posts" class="relative py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-16 section-reveal">
+            <span class="tag bg-royal-500/20 text-royal-300 border border-royal-500/30 mb-4 inline-block">লেখাপড়া ও সম্পদ</span>
+            <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">পড়াশোনার <span class="gradient-text">পোস্ট ও নোটস</span></h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">নিয়মিত আপডেট হওয়া পড়াশোনার পোস্ট, PDF নোটস এবং সাজেশন — সম্পূর্ণ ফ্রি!</p>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 section-reveal">
+            <button onclick="filterPosts('all')" class="post-filter active px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all bg-royal-600 text-white">সব</button>
+            <button onclick="filterPosts('post')" class="post-filter px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all glass-light text-gray-300 hover:text-white">পোস্ট</button>
+            <button onclick="filterPosts('pdf')" class="post-filter px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all glass-light text-gray-300 hover:text-white">PDF নোটস</button>
+            <button onclick="filterPosts('suggestion')" class="post-filter px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all glass-light text-gray-300 hover:text-white">সাজেশন</button>
+        </div>
+
+        <div id="postsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <!-- Posts rendered by JS -->
+        </div>
+    </div>
+</section>
+
+<!-- COURSES SECTION -->
+<section id="courses" class="relative py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-16 section-reveal">
+            <span class="tag bg-accent-500/20 text-accent-400 border border-accent-500/30 mb-4 inline-block">কোর্স ও ভর্তি</span>
+            <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">মানসম্মত <span class="gradient-text">কোর্সসমূহ</span></h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">অভিজ্ঞ শিক্ষকের তত্ত্বাবধানে সাশ্রয়ী মূল্যে মানসম্মত শিক্ষা গ্রহণ করুন</p>
+        </div>
+
+        <div id="coursesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <!-- Courses rendered by JS -->
+        </div>
+
+        <!-- Admission CTA -->
+        <div class="mt-12 sm:mt-16 glass rounded-2xl p-6 sm:p-10 text-center glow section-reveal">
+            <h3 class="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">আজই <span class="gradient-text">ভর্তি</span> হন!</h3>
+            <p class="text-gray-400 mb-6 max-w-lg mx-auto text-sm sm:text-base">সীমিত আসন — প্রথম আসা, প্রথম সুযোগ। এখনই আবেদন করুন এবং আপনার শিক্ষার যাত্রা শুরু করুন।</p>
+            <a href="https://wa.me/8801580370062?text=আমি%20ভর্তি%20হতে%20চাই" target="_blank" class="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-green-600 to-green-500 rounded-xl text-white font-semibold hover:shadow-xl hover:shadow-green-500/30 transition-all text-sm sm:text-base">
+                <i class="fab fa-whatsapp"></i> WhatsApp-এ আবেদন করুন
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section id="videos" class="relative py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-16 section-reveal">
+            <span class="tag bg-red-500/20 text-red-400 border border-red-500/30 mb-4 inline-block">ফ্রি ক্লাস</span>
+            <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">ফ্রি <span class="gradient-text">ভিডিও ক্লাস</span></h2>
+            <p class="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">প্রতিটি ভিডিও সম্পূর্ণ ফ্রি — ঘরে বসেই শিখুন!</p>
+        </div>
+
+        <div id="videosGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+            <!-- Videos rendered by JS -->
+        </div>
+
+        <div class="text-center mt-8 sm:mt-10 section-reveal">
+            <a href="https://www.youtube.com/@IHaveASchool" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 glass-light rounded-xl text-red-400 font-semibold hover:bg-red-500/10 transition-all text-sm sm:text-base">
+                <i class="fab fa-youtube"></i> YouTube চ্যানেলে আরও ভিডিও দেখুন
+                <i class="fas fa-external-link-alt text-xs"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- TEACHER PROFILE -->
+<section id="teacher" class="relative py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-16 section-reveal">
+            <span class="tag bg-royal-500/20 text-royal-300 border border-royal-500/30 mb-4 inline-block">শিক্ষক</span>
+            <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">আমাদের <span class="gradient-text">শিক্ষক</span></h2>
+        </div>
+
+        <div class="max-w-4xl mx-auto section-reveal">
+            <div class="glass rounded-2xl overflow-hidden glow">
+                <div class="h-32 sm:h-48 bg-gradient-to-r from-royal-600 via-royal-500 to-accent-500 relative">
+                    <div class="absolute inset-0 opacity-20" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><circle cx=%2240%22 cy=%2240%22 r=%2230%22 fill=%22none%22 stroke=%22white%22 stroke-width=%220.5%22/></svg>');background-size:80px"></div>
+                </div>
+                <div class="px-6 sm:px-10 pb-8 sm:pb-10 -mt-16 sm:-mt-20 text-center relative z-10">
+                    <div class="w-28 h-28 sm:w-36 sm:h-36 mx-auto rounded-full bg-gradient-to-br from-royal-500 to-accent-500 p-1 mb-4 sm:mb-6">
+                        <div class="w-full h-full rounded-full bg-[#0f0f1a] flex items-center justify-center">
+                            <i class="fas fa-chalkboard-teacher text-3xl sm:text-4xl gradient-text"></i>
+                        </div>
+                    </div>
+                    <h3 id="teacherName" class="text-xl sm:text-2xl md:text-3xl font-bold mb-1">MD Touhidul Hoque Tuhin</h3>
+                    <p id="teacherQual" class="text-royal-400 font-medium mb-4 text-sm sm:text-base">BA (Honours) in English</p>
+
+                    <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                        <div class="flex items-center gap-2 text-gray-400 text-xs sm:text-sm">
+                            <i class="fas fa-map-marker-alt text-royal-400"></i>
+                            <span id="teacherAddr">Mirsarai, Chattogram, Bangladesh</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-gray-400 text-xs sm:text-sm">
+                            <i class="fas fa-phone text-royal-400"></i>
+                            <span id="teacherPhone">+880 1580-370062</span>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-400 max-w-2xl mx-auto mb-6 sm:mb-8 text-sm sm:text-base leading-relaxed">
+                        ইংরেজি সাহিত্যে স্নাতক (সম্মান) ডিগ্রিধারী একজন অভিজ্ঞ ও নিবেদিতপ্রাণ শিক্ষক। তাঁর লক্ষ্য — প্রতিটি শিক্ষার্থীর মেধা ও সম্ভাবনাকে সম্পূর্ণতা দিন। "I Have A School" প্ল্যাটফর্মের মাধ্যমে তিনি সকলকে মানসম্মত শিক্ষা প্রদান করছেন।
+                    </p>
+
+                    <div class="flex items-center justify-center gap-3 sm:gap-4">
+                        <a href="https://www.youtube.com/@IHaveASchool" target="_blank" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl glass-light flex items-center justify-center text-red-400 hover:bg-red-500/20 transition">
+                            <i class="fab fa-youtube text-lg sm:text-xl"></i>
+                        </a>
+                        <a href="#" target="_blank" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl glass-light flex items-center justify-center text-blue-400 hover:bg-blue-500/20 transition">
+                            <i class="fab fa-facebook text-lg sm:text-xl"></i>
+                        </a>
+                        <a href="#" target="_blank" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl glass-light flex items-center justify-center text-gray-300 hover:bg-white/10 transition">
+                            <i class="fab fa-tiktok text-lg sm:text-xl"></i>
+                        </a>
+                        <a href="https://wa.me/8801580370062" target="_blank" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl glass-light flex items-center justify-center text-green-400 hover:bg-green-500/20 transition">
+                            <i class="fab fa-whatsapp text-lg sm:text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section id="contact" class="relative py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 sm:mb-16 section-reveal">
+            <span class="tag bg-royal-500/20 text-royal-300 border border-royal-500/30 mb-4 inline-block">যোগাযোগ</span>
+            <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">আমাদের সাথে <span class="gradient-text">যোগাযোগ</span> করুন</h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto section-reveal">
+            <div class="glass rounded-2xl p-6 sm:p-8 space-y-5 sm:space-y-6">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-royal-500/20 flex items-center justify-center shrink-0">
+                        <i class="fas fa-phone text-royal-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1 text-sm sm:text-base">ফোন ও WhatsApp</h4>
+                        <p class="text-gray-400 text-xs sm:text-sm">+880 1580-370062</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-royal-500/20 flex items-center justify-center shrink-0">
+                        <i class="fas fa-envelope text-royal-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1 text-sm sm:text-base">ইমেইল</h4>
+                        <p class="text-gray-400 text-xs sm:text-sm">tuhintouhidulhoque@gmail.com</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-royal-500/20 flex items-center justify-center shrink-0">
+                        <i class="fas fa-map-marker-alt text-royal-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-1 text-sm sm:text-base">ঠিকানা</h4>
+                        <p class="text-gray-400 text-xs sm:text-sm">Mirsarai, Chattogram, Bangladesh</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <a href="https://www.youtube.com/@IHaveASchool" target="_blank" class="w-10 h-10 rounded-xl glass-light flex items-center justify-center text-red-400 hover:bg-red-500/20 transition"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl glass-light flex items-center justify-center text-blue-400 hover:bg-blue-500/20 transition"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl glass-light flex items-center justify-center text-gray-300 hover:bg-white/10 transition"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-6 sm:p-8">
+                <h3 class="text-lg sm:text-xl font-bold mb-4 sm:mb-5">মেসেজ পাঠান</h3>
+                <form onsubmit="sendMessage(event)" class="space-y-3 sm:space-y-4">
+                    <input type="text" placeholder="আপনার নাম" required class="w-full px-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500">
+                    <input type="tel" placeholder="ফোন নম্বর" required class="w-full px-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500">
+                    <textarea placeholder="আপনার মেসেজ" rows="4" required class="w-full px-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 resize-none"></textarea>
+                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-royal-600 to-accent-500 rounded-xl text-white font-semibold hover:shadow-lg hover:shadow-royal-500/30 transition-all text-sm sm:text-base">
+                        <i class="fas fa-paper-plane mr-2"></i>পাঠান
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="relative border-t border-royal-500/10 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-8 sm:mb-10">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-royal-500 to-accent-500 flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-sm"></i>
+                    </div>
+                    <span class="text-lg font-bold gradient-text font-en">I Have A School</span>
+                </div>
+                <p class="text-gray-400 text-xs sm:text-sm leading-relaxed">নিয়মিত পড়াশোনার পোস্ট, নোটস, ফ্রি ভিডিও ক্লাস, সাজেশন এবং মানসম্মত কোর্সসমূহ।</p>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">দ্রুত লিংক</h4>
+                <div class="space-y-2">
+                    <a href="#home" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm">হোম</a>
+                    <a href="#posts" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm">পোস্ট ও নোটস</a>
+                    <a href="#courses" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm">কোর্সসমূহ</a>
+                    <a href="#videos" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm">ভিডিও</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">সোশ্যাল মিডিয়া</h4>
+                <div class="space-y-2">
+                    <a href="https://www.youtube.com/@IHaveASchool" target="_blank" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm"><i class="fab fa-youtube mr-2 text-red-400"></i>YouTube</a>
+                    <a href="#" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm"><i class="fab fa-facebook mr-2 text-blue-400"></i>Facebook</a>
+                    <a href="#" class="block text-gray-400 hover:text-white transition text-xs sm:text-sm"><i class="fab fa-tiktok mr-2"></i>TikTok</a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">যোগাযোগ</h4>
+                <div class="space-y-2">
+                    <p class="text-gray-400 text-xs sm:text-sm"><i class="fas fa-phone mr-2 text-royal-400"></i>+880 1580-370062</p>
+                    <p class="text-gray-400 text-xs sm:text-sm"><i class="fas fa-envelope mr-2 text-royal-400"></i>tuhintouhidulhoque@gmail.com</p>
+                    <p class="text-gray-400 text-xs sm:text-sm"><i class="fas fa-map-marker-alt mr-2 text-royal-400"></i>Mirsarai, Chattogram</p>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/5 pt-6 sm:pt-8 text-center">
+            <p class="text-gray-500 text-xs sm:text-sm">&copy; 2025 I Have A School — সর্বস্বত্ব সংরক্ষিত। পরিকল্পনা ও বাস্তবায়ন: <span class="gradient-text font-semibold">MD Touhidul Hoque Tuhin</span></p>
+        </div>
+    </div>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/8801580370062?text=আসসালামু%20আলাইকুম" target="_blank" id="whatsappBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform animate-pulse-glow">
+    <i class="fab fa-whatsapp text-white text-2xl sm:text-3xl"></i>
+</a>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="adminLoginModal" class="fixed inset-0 z-[9997] hidden items-center justify-center" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)">
+    <div class="glass rounded-2xl p-6 sm:p-8 w-full max-w-sm mx-4 glow">
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-royal-500 to-accent-500 flex items-center justify-center mb-3">
+                <i class="fas fa-shield-alt text-white text-xl"></i>
+            </div>
+            <h3 class="text-xl font-bold">এডমিন লগইন</h3>
+            <p class="text-gray-400 text-sm mt-1">প্ল্যাটফর্ম পরিচালনা করুন</p>
+        </div>
+        <form onsubmit="adminLogin(event)" class="space-y-4">
+            <div>
+                <label class="text-xs text-gray-400 mb-1 block">ইমেইল</label>
+                <input type="email" id="adminEmail" required class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500" placeholder="admin@email.com">
+            </div>
+            <div>
+                <label class="text-xs text-gray-400 mb-1 block">পাসওয়ার্ড</label>
+                <input type="password" id="adminPass" required class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder-gray-500" placeholder="••••••••">
+            </div>
+            <div id="loginError" class="text-red-400 text-xs hidden">ইমেইল বা পাসওয়ার্ড ভুল!</div>
+            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-royal-600 to-accent-500 rounded-xl text-white font-semibold hover:shadow-lg transition-all text-sm">
+                <i class="fas fa-sign-in-alt mr-2"></i>লগইন
+            </button>
+        </form>
+        <button onclick="closeAdminLogin()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"><i class="fas fa-times"></i></button>
+    </div>
+</div>
+
+<!-- ADMIN PANEL OVERLAY -->
+<div id="adminOverlay" class="admin-overlay" onclick="closeAdminPanel()"></div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="admin-panel">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold gradient-text">এডমিন প্যানেল</h3>
+        <button onclick="closeAdminPanel()" class="text-gray-400 hover:text-white transition p-2"><i class="fas fa-times text-lg"></i></button>
+    </div>
+
+    <div class="space-y-6">
+        <!-- Hero Slider Edit -->
+        <details class="glass rounded-xl overflow-hidden" open>
+            <summary class="px-4 py-3 cursor-pointer text-sm font-semibold flex items-center gap-2 hover:bg-white/5 transition">
+                <i class="fas fa-images text-royal-400"></i> হিরো স্লাইডার
+            </summary>
+            <div class="px-4 pb-4 space-y-3">
+                <div id="heroSlidesEditor"></div>
+                <button onclick="addHeroSlideEditor()" class="w-full py-2 glass-light rounded-lg text-xs text-royal-300 hover:bg-white/10 transition"><i class="fas fa-plus mr-1"></i> স্লাইড যোগ করুন</button>
+            </div>
+        </details>
+
+        <!-- Posts Edit -->
+        <details class="glass rounded-xl overflow-hidden">
+            <summary class="px-4 py-3 cursor-pointer text-sm font-semibold flex items-center gap-2 hover:bg-white/5 transition">
+                <i class="fas fa-file-alt text-royal-400"></i> পোস্ট ও PDF
+            </summary>
+            <div class="px-4 pb-4 space-y-3">
+                <div id="postsEditor"></div>
+                <button onclick="addPostEditor()" class="w-full py-2 glass-light rounded-lg text-xs text-royal-300 hover:bg-white/10 transition"><i class="fas fa-plus mr-1"></i> পোস্ট যোগ করুন</button>
+            </div>
+        </details>
+
+        <!-- Courses Edit -->
+        <details class="glass rounded-xl overflow-hidden">
+            <summary class="px-4 py-3 cursor-pointer text-sm font-semibold flex items-center gap-2 hover:bg-white/5 transition">
+                <i class="fas fa-graduation-cap text-royal-400"></i> কোর্সসমূহ
+            </summary>
+            <div class="px-4 pb-4 space-y-3">
+                <div id="coursesEditor"></div>
+                <button onclick="addCourseEditor()" class="w-full py-2 glass-light rounded-lg text-xs text-royal-300 hover:bg-white/10 transition"><i class="fas fa-plus mr-1"></i> কোর্স যোগ করুন</button>
+            </div>
+        </details>
+
+        <!-- Videos Edit -->
+        <details class="glass rounded-xl overflow-hidden">
+            <summary class="px-4 py-3 cursor-pointer text-sm font-semibold flex items-center gap-2 hover:bg-white/5 transition">
+                <i class="fas fa-video text-royal-400"></i> ভিডিও
+            </summary>
+            <div class="px-4 pb-4 space-y-3">
+                <div id="videosEditor"></div>
+                <button onclick="addVideoEditor()" class="w-full py-2 glass-light rounded-lg text-xs text-royal-300 hover:bg-white/10 transition"><i class="fas fa-plus mr-1"></i> ভিডিও যোগ করুন</button>
+            </div>
+        </details>
+
+        <!-- Contact Edit -->
+        <details class="glass rounded-xl overflow-hidden">
+            <summary class="px-4 py-3 cursor-pointer text-sm font-semibold flex items-center gap-2 hover:bg-white/5 transition">
+                <i class="fas fa-phone text-royal-400"></i> যোগাযোগ
+            </summary>
+            <div class="px-4 pb-4 space-y-3">
+                <label class="text-xs text-gray-400">শিক্ষকের নাম</label>
+                <input type="text" id="edTeacherName" class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" onchange="updateField('teacherName',this.value)">
+                <label class="text-xs text-gray-400">যোগ্যতা</label>
+                <input type="text" id="edTeacherQual" class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" onchange="updateField('teacherQual',this.value)">
+                <label class="text-xs text-gray-400">ঠিকানা</label>
+                <input type="text" id="edTeacherAddr" class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" onchange="updateField('teacherAddr',this.value)">
+                <label class="text-xs text-gray-400">ফোন/WhatsApp</label>
+                <input type="text" id="edTeacherPhone" class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" onchange="updateField('teacherPhone',this.value)">
+            </div>
+        </details>
+
+        <button onclick="adminLogout()" class="w-full py-3 bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 font-semibold hover:bg-red-500/30 transition text-sm">
+            <i class="fas fa-sign-out-alt mr-2"></i>লগআউট
+        </button>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed top-6 right-6 z-[10000] hidden">
+    <div class="glass rounded-xl px-5 py-3 flex items-center gap-3 glow">
+        <i id="toastIcon" class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMsg" class="text-sm"></span>
+    </div>
+</div>
+
+<script>
+// ============ DATA ============
+const defaultData = {
+    heroSlides: [
+        { img:'https://picsum.photos/seed/school1/1200/600', title:'শিক্ষার আলো ছড়িয়ে সবার মাঝে', sub:'নিয়মিত পড়াশোনার পোস্ট, নোটস, ফ্রি ভিডিও ক্লাস, সাজেশন এবং মানসম্মত কোর্সসমূহ — সবকিছু এক জায়গায়।' },
+        { img:'https://picsum.photos/seed/education2/1200/600', title:'ইংরেজি শিখুন সহজে', sub:'অভিজ্ঞ শিক্ষকের তত্ত্বাবধানে ইংরেজি সাহিত্য ও ভাষার সবকিছু শিখুন।' },
+        { img:'https://picsum.photos/seed/study3/1200/600', title:'ফ্রি ক্লাস — সবার জন্য', sub:'কোনো খরচ ছাড়াই ভিডিও ক্লাস, নোটস ও সাজেশন পান।' }
+    ],
+    posts: [
+        { id:1, type:'post', title:'Importance of Learning English', desc:'ইংরেজি শিখার গুরুত্ব ও প্রয়োজনীয়তা সম্পর্কে বিস্তারিত আলোচনা।', date:'2025-01-15', tag:'ইংরেজি', pdfLink:'' },
+        { id:2, type:'pdf', title:'English Grammar Notes (PDF)', desc:'সম্পূর্ণ ইংরেজি গ্রামার নোটস — ফ্রি ডাউনলোড।', date:'2025-01-12', tag:'গ্রামার', pdfLink:'https://example.com/grammar.pdf' },
+        { id:3, type:'suggestion', title:'HSC English 2nd Paper Suggestion', desc:'HSC পরীক্ষার্থীদের জন্য বিশেষ সাজেশন।', date:'2025-01-10', tag:'সাজেশন', pdfLink:'' },
+        { id:4, type:'post', title:'How to Write a Good Paragraph', desc:'একটি ভালো অনুচ্ছেদ লেখার কৌশল ও পদ্ধতি।', date:'2025-01-08', tag:'লেখা', pdfLink:'' },
+        { id:5, type:'pdf', title:'Vocabulary List - Daily Use Words', desc:'প্রতিদিন ব্যবহৃত 500+ ইংরেজি শব্দের তালিকা।', date:'2025-01-05', tag:'শব্দতালিকা', pdfLink:'https://example.com/vocab.pdf' },
+        { id:6, type:'suggestion', title:'SSC English Final Suggestion 2025', desc:'SSC পরীক্ষার্থীদের জন্য চূড়ান্ত সাজেশন।', date:'2025-01-03', tag:'সাজেশন', pdfLink:'' }
+    ],
+    courses: [
+        { id:1, title:'HSC English Complete Course', desc:'HSC ইংরেজি ১ম ও ২য় পত্রের সম্পূর্ণ কোর্স — ভিডিও, নোটস ও সাজেশন সহ।', fee:'৳2000', duration:'6 মাস', students:120, popular:true },
+        { id:2, title:'SSC English Special Batch', desc:'SSC পরীক্ষার্থীদের জন্য বিশেষ ব্যাচ — সাজেশন ও মডেল টেস্ট সহ।', fee:'৳1500', duration:'4 মাস', students:85, popular:false },
+        { id:3, title:'Spoken English Course', desc:'দৈনন্দিন কথোপকথনে ইংরেজি বলার দক্ষতা বৃদ্ধি কোর্স।', fee:'৳1000', duration:'3 মাস', students:60, popular:true },
+        { id:4, title:'English Grammar Masterclass', desc:'গ্রামারের সবকিছু এক জায়গায় — শুরু থেকে উন্নত পর্যায়।', fee:'৳800', duration:'2 মাস', students:45, popular:false },
+        { id:5, title:'Essay & Paragraph Writing', desc:'প্রবন্ধ ও অনুচ্ছেদ লেখার সম্পূর্ণ প্রস্তুতি কোর্স।', fee:'৳600', duration:'1.5 মাস', students:35, popular:false },
+        { id:6, title:'Free Masterclass (Weekly)', desc:'প্রতি সপ্তাহে ফ্রি মাস্টারক্লাস — সবার জন্য উন্মুক্ত।', fee:'ফ্রি', duration:'চলমান', students:200, popular:true }
+    ],
+    videos: [
+        { id:1, title:'English Grammar Basics — Part 1', youtubeId:'dQw4w9WgXcQ', desc:'গ্রামারের মৌলিক ধারণা — পর্ব ১' },
+        { id:2, title:'How to Write a Perfect Paragraph', youtubeId:'dQw4w9WgXcQ', desc:'অনুচ্ছেদ লেখার সঠিক পদ্ধতি' },
+        { id:3, title:'Tense - Present, Past & Future', youtubeId:'dQw4w9WgXcQ', desc:'Tense এর সবকিছু সহজে' },
+        { id:4, title:'Vocabulary Building Tips', youtubeId:'dQw4w9WgXcQ', desc:'শব্দভান্ডার বৃদ্ধির কৌশল' }
+    ],
+    teacher: { name:'MD Touhidul Hoque Tuhin', qual:'BA (Honours) in English', addr:'Mirsarai, Chattogram, Bangladesh', phone:'+880 1580-370062' }
+};
+
+let siteData = JSON.parse(localStorage.getItem('ihasSchoolData')) || JSON.parse(JSON.stringify(defaultData));
+let isAdmin = false;
+let currentSlide = 0;
+let slideInterval;
+
+function saveData() { localStorage.setItem('ihasSchoolData', JSON.stringify(siteData)); }
+
+// ============ RENDER ============
+function renderHeroSlides() {
+    const container = document.getElementById('heroSlider');
+    container.innerHTML = siteData.heroSlides.map((s,i) =>
+        `<div class="hero-slide ${i===0?'active':''}" style="background:url('${s.img}') center/cover no-repeat"></div>`
+    ).join('');
+    document.getElementById('heroTitle').innerHTML = siteData.heroSlides[0]?.title || '';
+    document.getElementById('heroSub').textContent = siteData.heroSlides[0]?.sub || '';
+    currentSlide = 0;
+    startSlider();
+}
+
+function startSlider() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => {
+        currentSlide = (currentSlide + 1) % siteData.heroSlides.length;
+        goToSlide(currentSlide);
+    }, 5000);
+}
+
+function goToSlide(idx) {
+    currentSlide = idx;
+    document.querySelectorAll('.hero-slide').forEach((s,i) => s.classList.toggle('active', i===idx));
+    document.querySelectorAll('.slider-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+    if(siteData.heroSlides[idx]) {
+        document.getElementById('heroTitle').innerHTML = siteData.heroSlides[idx].title;
+        document.getElementById('heroSub').textContent = siteData.heroSlides[idx].sub;
+    }
+}
+
+function renderPosts(filter='all') {
+    const filtered = filter==='all' ? siteData.posts : siteData.posts.filter(p=>p.type===filter);
+    const grid = document.getElementById('postsGrid');
+    grid.innerHTML = filtered.map(p => {
+        const typeColors = { post:'from-royal-500 to-royal-600', pdf:'from-green-500 to-emerald-600', suggestion:'from-amber-500 to-orange-600' };
+        const typeLabels = { post:'পোস্ট', pdf:'PDF', suggestion:'সাজেশন' };
+        const typeIcons = { post:'fa-file-alt', pdf:'fa-file-pdf', suggestion:'fa-lightbulb' };
+        return `
+        <div class="glass rounded-2xl overflow-hidden card-hover">
+            <div class="h-2 bg-gradient-to-r ${typeColors[p.type]}"></div>
+            <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="tag bg-gradient-to-r ${typeColors[p.type]} text-white text-[10px]"><i class="fas ${typeIcons[p.type]} mr-1"></i>${typeLabels[p.type]}</span>
+                    <span class="text-xs text-gray-500">${p.date}</span>
+                </div>
+                <h3 class="text-base sm:text-lg font-bold mb-2">${p.title}</h3>
+                <p class="text-gray-400 text-xs sm:text-sm mb-4 leading-relaxed">${p.desc}</p>
+                <div class="flex items-center justify-between">
+                    <span class="tag bg-white/5 text-gray-300 border border-white/10 text-[10px]">${p.tag}</span>
+                    ${p.pdfLink ? `<a href="${p.pdfLink}" target="_blank" class="inline-flex items-center gap-1 text-green-400 text-xs font-semibold hover:text-green-300 transition"><i class="fas fa-download"></i> PDF</a>` : `<span class="text-xs text-gray-500"><i class="fas fa-eye mr-1"></i>পড়ুন</span>`}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function filterPosts(type) {
+    document.querySelectorAll('.post-filter').forEach((b,i) => {
+        const types = ['all','post','pdf','suggestion'];
+        if(types[i]===type) { b.className = b.className.replace('glass-light text-gray-300','').replace('hover:text-white','') + ' bg-royal-600 text-white'; }
+        else { b.className = 'post-filter px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all glass-light text-gray-300 hover:text-white'; }
+    });
+    renderPosts(type);
+}
+
+function renderCourses() {
+    const grid = document.getElementById('coursesGrid');
+    grid.innerHTML = siteData.courses.map(c => `
+        <div class="glass rounded-2xl overflow-hidden card-hover relative">
+            ${c.popular ? '<div class="absolute top-4 right-4 z-10"><span class="tag bg-gradient-to-r from-accent-500 to-royal-500 text-white text-[10px]"><i class="fas fa-fire mr-1"></i>জনপ্রিয়</span></div>' : ''}
+            <div class="p-5 sm:p-6">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-royal-500/20 to-accent-500/20 flex items-center justify-center mb-4">
+                    <i class="fas fa-book-reader text-royal-400 text-lg"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-bold mb-2">${c.title}</h3>
+                <p class="text-gray-400 text-xs sm:text-sm mb-4 leading-relaxed">${c.desc}</p>
+                <div class="flex items-center gap-3 mb-4 text-xs text-gray-400">
+                    <span><i class="fas fa-clock mr-1 text-royal-400"></i>${c.duration}</span>
+                    <span><i class="fas fa-users mr-1 text-royal-400"></i>${c.students}+ শিক্ষার্থী</span>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                    <span class="text-lg sm:text-xl font-bold gradient-text font-en">${c.fee}</span>
+                    <a href="https://wa.me/8801580370062?text=আমি%20${encodeURIComponent(c.title)}%20কোর্সে%20ভর্তি%20হতে%20চাই" target="_blank" class="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-royal-600 to-royal-500 rounded-lg text-white text-xs font-semibold hover:shadow-lg transition">
+                        ভর্তি <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderVideos() {
+    const grid = document.getElementById('videosGrid');
+    grid.innerHTML = siteData.videos.map(v => `
+        <div class="glass rounded-2xl overflow-hidden card-hover">
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/${v.youtubeId}" allowfullscreen loading="lazy"></iframe>
+            </div>
+            <div class="p-4 sm:p-5">
+                <h3 class="text-sm sm:text-base font-bold mb-1">${v.title}</h3>
+                <p class="text-gray-400 text-xs">${v.desc}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderTeacherInfo() {
+    document.getElementById('teacherName').textContent = siteData.teacher.name;
+    document.getElementById('teacherQual').textContent = siteData.teacher.qual;
+    document.getElementById('teacherAddr').textContent = siteData.teacher.addr;
+    document.getElementById('teacherPhone').textContent = siteData.teacher.phone;
+}
+
+// ============ ADMIN ============
+function openAdminLogin() {
+    if(isAdmin) { openAdminPanel(); return; }
+    document.getElementById('adminLoginModal').style.display = 'flex';
+}
+
+function closeAdminLogin() {
+    document.getElementById('adminLoginModal').style.display = 'none';
+    document.getElementById('loginError').classList.add('hidden');
+}
+
+function adminLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('adminEmail').value;
+    const pass = document.getElementById('adminPass').value;
+    if(email === 'tuhintouhidulhoque@gmail.com' && pass === '13837901SKTTS') {
+        isAdmin = true;
+        closeAdminLogin();
+        openAdminPanel();
+        showToast('এডমিন প্যানেলে প্রবেশ সফল!', 'success');
+    } else {
+        document.getElementById('loginError').classList.remove('hidden');
+    }
+}
+
+function adminLogout() {
+    isAdmin = false;
+    closeAdminPanel();
+    showToast('লগআউট সফল', 'info');
+}
+
+function openAdminPanel() {
+    if(!isAdmin) return;
+    document.getElementById('adminOverlay').classList.add('show');
+    document.getElementById('adminPanel').classList.add('open');
+    populateAdminEditors();
+}
+
+function closeAdminPanel() {
+    document.getElementById('adminOverlay').classList.remove('show');
+    document.getElementById('adminPanel').classList.remove('open');
+}
+
+function populateAdminEditors() {
+    // Hero slides
+    const heroEd = document.getElementById('heroSlidesEditor');
+    heroEd.innerHTML = siteData.heroSlides.map((s,i) => `
+        <div class="glass-light rounded-lg p-3 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs text-royal-300 font-semibold">স্লাইড ${i+1}</span>
+                <button onclick="removeHeroSlide(${i})" class="text-red-400 text-xs hover:text-red-300"><i class="fas fa-trash"></i></button>
+            </div>
+            <input type="text" value="${s.img}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="ছবি URL" onchange="siteData.heroSlides[${i}].img=this.value;saveAndRefresh()">
+            <input type="text" value="${s.title.replace(/"/g,'&quot;')}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="শিরোনাম" onchange="siteData.heroSlides[${i}].title=this.value;saveAndRefresh()">
+            <input type="text" value="${s.sub.replace(/"/g,'&quot;')}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="উপশিরোনাম" onchange="siteData.heroSlides[${i}].sub=this.value;saveAndRefresh()">
+        </div>
+    `).join('');
+
+    // Posts
+    const postsEd = document.getElementById('postsEditor');
+    postsEd.innerHTML = siteData.posts.map((p,i) => `
+        <div class="glass-light rounded-lg p-3 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs text-royal-300 font-semibold">${p.title.substring(0,20)}...</span>
+                <button onclick="removePost(${i})" class="text-red-400 text-xs hover:text-red-300"><i class="fas fa-trash"></i></button>
+            </div>
+            <input type="text" value="${p.title.replace(/"/g,'&quot;')}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="শিরোনাম" onchange="siteData.posts[${i}].title=this.value;saveAndRefresh()">
+            <textarea class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs resize-none" rows="2" placeholder="বিবরণ" onchange="siteData.posts[${i}].desc=this.value;saveAndRefresh()">${p.desc}</textarea>
+            <select class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" onchange="siteData.posts[${i}].type=this.value;saveAndRefresh()">
+                <option value="post" ${p.type==='post'?'selected':''}>পোস্ট</option>
+                <option value="pdf" ${p.type==='pdf'?'selected':''}>PDF</option>
+                <option value="suggestion" ${p.type==='suggestion'?'selected':''}>সাজেশন</option>
+            </select>
+            <input type="text" value="${p.tag}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="ট্যাগ" onchange="siteData.posts[${i}].tag=this.value;saveAndRefresh()">
+            <input type="text" value="${p.pdfLink}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="PDF লিংক (ঐচ্ছিক)" onchange="siteData.posts[${i}].pdfLink=this.value;saveAndRefresh()">
+        </div>
+    `).join('');
+
+    // Courses
+    const coursesEd = document.getElementById('coursesEditor');
+    coursesEd.innerHTML = siteData.courses.map((c,i) => `
+        <div class="glass-light rounded-lg p-3 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs text-royal-300 font-semibold">${c.title.substring(0,20)}...</span>
+                <button onclick="removeCourse(${i})" class="text-red-400 text-xs hover:text-red-300"><i class="fas fa-trash"></i></button>
+            </div>
+            <input type="text" value="${c.title.replace(/"/g,'&quot;')}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="কোর্সের নাম" onchange="siteData.courses[${i}].title=this.value;saveAndRefresh()">
+            <textarea class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs resize-none" rows="2" placeholder="বিবরণ" onchange="siteData.courses[${i}].desc=this.value;saveAndRefresh()">${c.desc}</textarea>
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" value="${c.fee}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="ফি" onchange="siteData.courses[${i}].fee=this.value;saveAndRefresh()">
+                <input type="text" value="${c.duration}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="সময়কাল" onchange="siteData.courses[${i}].duration=this.value;saveAndRefresh()">
+            </div>
+            <label class="flex items-center gap-2 text-xs text-gray-400"><input type="checkbox" ${c.popular?'checked':''} onchange="siteData.courses[${i}].popular=this.checked;saveAndRefresh()"> জনপ্রিয়</label>
+        </div>
+    `).join('');
+
+    // Videos
+    const videosEd = document.getElementById('videosEditor');
+    videosEd.innerHTML = siteData.videos.map((v,i) => `
+        <div class="glass-light rounded-lg p-3 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs text-royal-300 font-semibold">${v.title.substring(0,20)}...</span>
+                <button onclick="removeVideo(${i})" class="text-red-400 text-xs hover:text-red-300"><i class="fas fa-trash"></i></button>
+            </div>
+            <input type="text" value="${v.title.replace(/"/g,'&quot;')}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="ভিডিও শিরোনাম" onchange="siteData.videos[${i}].title=this.value;saveAndRefresh()">
+            <input type="text" value="${v.youtubeId}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="YouTube ভিডিও ID" onchange="siteData.videos[${i}].youtubeId=this.value;saveAndRefresh()">
+            <input type="text" value="${v.desc.replace(/"/g,'&quot;')}" class="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-xs" placeholder="বিবরণ" onchange="siteData.videos[${i}].desc=this.value;saveAndRefresh()">
+        </div>
+    `).join('');
+
+    // Teacher
+    document.getElementById('edTeacherName').value = siteData.teacher.name;
+    document.getElementById('edTeacherQual').value = siteData.teacher.qual;
+    document.getElementById('edTeacherAddr').value = siteData.teacher.addr;
+    document.getElementById('edTeacherPhone').value = siteData.teacher.phone;
+}
+
+function updateField(field, value) {
+    const map = { teacherName:'name', teacherQual:'qual', teacherAddr:'addr', teacherPhone:'phone' };
+    if(map[field]) { siteData.teacher[map[field]] = value; saveAndRefresh(); }
+}
+
+function saveAndRefresh() {
+    saveData();
+    renderAll();
+}
+
+// Add/Remove functions
+function addHeroSlideEditor() {
+    siteData.heroSlides.push({ img:'https://picsum.photos/seed/new'+Date.now()+'/1200/600', title:'নতুন স্লাইড', sub:'বিবরণ দিন' });
+    saveAndRefresh(); populateAdminEditors();
+}
+function removeHeroSlide(i) { siteData.heroSlides.splice(i,1); saveAndRefresh(); populateAdminEditors(); }
+
+function addPostEditor() {
+    siteData.posts.push({ id:Date.now(), type:'post', title:'নতুন পোস্ট', desc:'বিবরণ', date:new Date().toISOString().split('T')[0], tag:'নতুন', pdfLink:'' });
+    saveAndRefresh(); populateAdminEditors();
+}
+function removePost(i) { siteData.posts.splice(i,1); saveAndRefresh(); populateAdminEditors(); }
+
+function addCourseEditor() {
+    siteData.courses.push({ id:Date.now(), title:'নতুন কোর্স', desc:'বিবরণ', fee:'৳0', duration:'1 মাস', students:0, popular:false });
+    saveAndRefresh(); populateAdminEditors();
+}
+function removeCourse(i) { siteData.courses.splice(i,1); saveAndRefresh(); populateAdminEditors(); }
+
+function addVideoEditor() {
+    siteData.videos.push({ id:Date.now(), title:'নতুন ভিডিও', youtubeId:'dQw4w9WgXcQ', desc:'বিবরণ' });
+    saveAndRefresh(); populateAdminEditors();
+}
+function removeVideo(i) { siteData.videos.splice(i,1); saveAndRefresh(); populateAdminEditors(); }
+
+// ============ UI ============
+function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('hidden'); }
+function closeMobileMenu() { document.getElementById('mobileMenu').classList.add('hidden'); }
+
+function sendMessage(e) {
+    e.preventDefault();
+    showToast('মেসেজ পাঠানো হয়েছে! শীঘ্রই যোগাযোগ করা হবে।', 'success');
+    e.target.reset();
+}
+
+function showToast(msg, type='success') {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    document.getElementById('toastMsg').textContent = msg;
+    icon.className = type==='success' ? 'fas fa-check-circle text-green-400' : type==='error' ? 'fas fa-exclamation-circle text-red-400' : 'fas fa-info-circle text-royal-400';
+    toast.classList.remove('hidden');
+    toast.style.animation = 'slideUp 0.3s ease-out';
+    setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+}
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if(window.scrollY > 50) { nav.classList.add('glass'); nav.style.borderBottom = '1px solid rgba(99,102,241,0.1)'; }
+    else { nav.classList.remove('glass'); nav.style.borderBottom = 'none'; }
+});
+
+// Section reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold:0.1 });
+document.querySelectorAll('.section-reveal').forEach(el => observer.observe(el));
+
+// Particles
+function createParticles() {
+    const container = document.getElementById('particles');
+    for(let i=0; i<30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random()*100+'%';
+        p.style.top = Math.random()*100+'%';
+        p.style.animationDuration = (3+Math.random()*5)+'s';
+        p.style.animationDelay = Math.random()*3+'s';
+        p.style.opacity = 0.1+Math.random()*0.3;
+        p.style.animation = `float ${3+Math.random()*5}s ease-in-out ${Math.random()*3}s infinite`;
+        container.appendChild(p);
+    }
+}
+
+// Render all
+function renderAll() {
+    renderHeroSlides();
+    renderPosts();
+    renderCourses();
+    renderVideos();
+    renderTeacherInfo();
+    // Re-observe new elements
+    document.querySelectorAll('.section-reveal').forEach(el => observer.observe(el));
+}
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+    renderAll();
+    createParticles();
+});
+</script>
+
+</body>
+</html>
